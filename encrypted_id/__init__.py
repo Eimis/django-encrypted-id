@@ -59,7 +59,9 @@ def decode(e):
         cypher = AES.new(skey[:24], AES.MODE_CBC, skey[-16:])
         msg = cypher.decrypt(e)
 
-        crc, the_id = struct.unpack("<IQxxxx", msg)
+        # XXX: monkeypatch so it doesn't break on Python 2.7.3:
+        # crc, the_id = struct.unpack("<IQxxxx", msg)
+        crc, the_id = struct.unpack(str("<IQxxxx"), msg)
 
         if crc != binascii.crc32(bytes(the_id)) & 0xffffffff:
             continue
